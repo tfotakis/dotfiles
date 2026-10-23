@@ -1,3 +1,6 @@
+# ------------------------------------------------------------------------------
+# ZSH Configuration
+# ------------------------------------------------------------------------------
 HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=1000
@@ -25,12 +28,14 @@ setopt hist_ignore_all_dups
 # Stop error notification beep
 unsetopt beep notify
 
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+	source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # If you come from bash you might have to change your $PATH.
@@ -74,10 +79,10 @@ zstyle ':omz:update' frequency 1
 # see 'man strftime' for details.
 HIST_STAMPS="yyyy-mm-dd"
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
 
-# Which plugins would you like to load?
+# ------------------------------------------------------------------------------
+# Plugins
+# ------------------------------------------------------------------------------
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
@@ -102,23 +107,44 @@ plugins=(
 	# git
 )
 
-# User configuration
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-if [[ -n $SSH_CONNECTION ]]; then
-	export EDITOR='nano'
-else
-	export EDITOR='nano'
+# ------------------------------------------------------------------------------
+# Oh My Zsh configuration
+# ------------------------------------------------------------------------------
+# ZSH Cache directory
+ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
+if [[ ! -d $ZSH_CACHE_DIR ]]; then
+	mkdir $ZSH_CACHE_DIR
 fi
 
-export SSH_KEY_PATH="~/.ssh/rsa_id"
+# ZSH Custom directory
+source $ZSH/oh-my-zsh.sh
 
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+
+# ------------------------------------------------------------------------------
+# User variables
+# ------------------------------------------------------------------------------
+LS='gls'
+# LS='lsd'
+
+NANO="/opt/homebrew/bin/nano"
+
+# Set default editor based on SSH connection
+if [[ -n $SSH_CONNECTION ]]; then
+	EDITOR=$NANO
+else
+	EDITOR=$NANO
+fi
+
+SSH_KEY_PATH="~/.ssh/rsa_id"
+
+
+# ------------------------------------------------------------------------------
+# Aliases
+# ------------------------------------------------------------------------------
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
@@ -127,33 +153,21 @@ export SSH_KEY_PATH="~/.ssh/rsa_id"
 # - $ZSH_CUSTOM/aliases.zsh
 # - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Common Aliases plugin functions (with customizations)
-# ls, the common ones I use a lot shortened for rapid fire usage
-alias l='ls -lFh'     #size,show type,human readable
-alias la='ls -lAFh'   #long list,show almost all,show type,human readable
-alias lr='ls -tRFh'   #sorted by date,recursive,show type,human readable
-alias lt='ls -ltFh'   #long list,sorted by date,show type,human readable
-alias ll='ls -l'      #long list
-alias ldot='ls -ld .*'
-alias lS='ls -1FSsh'
-alias lart='ls -1Fcart'
-alias lrt='ls -1Fcrt'
-alias lsr='ls -lARFh' #Recursive list of files and directories
-alias lsn='ls -1'     #A column contains name of files and directories
+alias mkdir="mkdir -p"
 
-alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
-alias czshrc='code ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
-alias kittyconf='${=EDITOR} ${ZDOTDIR:-$HOME}/.config/kitty/kitty.conf' # Quick access to the .zshrc file
+# File listing
+alias ls='$LS --color -h --group-directories-first'
 
-alias grep='grep --color'
-alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
-
-alias t='tail -f'
+alias ll='$LS       --color --group-directories-first -lFh'         # long list, no dotfiles
+alias la='$LS       --color --group-directories-first -AlFh'        # long list, show almost all, show type, human readable
+alias ldot='$LS     --color --group-directories-first -ldh .*'      # list dot files
+alias llc='$LS      --color --group-directories-first -1'           # A column contains name of files and directories
+alias lac='$LS      --color --group-directories-first -1A'          # A column contains name of files and directories + hidden files
+alias ldotc='$LS    --color --group-directories-first -1d .*'       # A column contains name of files and directories only hidden files
+alias llt='$LS      --color --group-directories-first -lFht'        # long list, no dotfiles, sorted by date
+alias lat='$LS      --color --group-directories-first -AlFht'       # long list, show almost all, show type, human readable, sorted by date
+alias ldott='$LS    --color --group-directories-first -ldht .*'     # list dot files, sorted by date
 
 # Command line head / tail shortcuts
 # alias -g H='| head'
@@ -167,55 +181,64 @@ alias t='tail -f'
 # alias -g NUL="> /dev/null 2>&1"
 # alias -g P="2>&1| pygmentize -l pytb"
 
+# ZSH Config editors
+alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
+alias czshrc='code ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
+alias zsh-reload='source ~/.zshrc'
+
+# Kitty Config editors
+# alias kittyconf='${=EDITOR} ${ZDOTDIR:-$HOME}/.config/kitty/kitty.conf' # Quick access to the .zshrc file
+
+# Grep aliases
+alias grep='grep --color'
+alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
+
+alias t='tail -f'
+
+# File size
 alias dud='du -d 1 -h'
 (( $+commands[duf] )) || alias duf='du -sh *'
 (( $+commands[fd] )) || alias fd='find . -type d -name'
+
+# Find files
 alias ff='find . -type f -name'
 
+# Terminal history
 alias h='history'
 alias hgrep="fc -El 0 | grep"
+
+# Miscellaneous
 alias help='man'
 alias p='ps -f'
 alias sortnr='sort -n -r'
 alias unexport='unset'
 
 
-# User Aliases
-alias yayy="yay --noconfirm"
-alias yayr="yay -Rnsu"
-alias yayrf="yay -Rnsudd"
+# Arch Linux shortcuts
+# alias yayy="yay --noconfirm"
+# alias yayr="yay -Rnsu"
+# alias yayrf="yay -Rnsudd"
+# alias saveForWeb="mogrify -format jpg -resize 1920x1280 *.jpg; jpegoptim -S400 -w8 -sq *.jpg"
+# alias mpv="mpv --no-config --hwdec=yes --vo=gpu-next --target-colorspace-hint --gpu-context=waylandvk --gpu-api=vulkan --hdr-compute-peak=no --framedrop=no"
 
-alias waketv="wakeonlan 20:28:BC:AC:65:AA"
-alias saveForWeb="mogrify -format jpg -resize 1920x1280 *.jpg; jpegoptim -S400 -w8 -sq *.jpg"
-
-alias mkdir="mkdir -p"
-
-alias ls="lsd"
-
+# UART Print tool
 #alias uart-print="stty -F /dev/ttyUSB0 406:0:18b2:8a30:3:1c:7f:15:4:2:64:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0 && stdbuf -o0 cat /dev/ttyUSB0"
 #alias uart-print-log="stty -F /dev/ttyUSB0 406:0:18b2:8a30:3:1c:7f:15:4:2:64:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0 && stdbuf -o0 cat /dev/ttyUSB0 | tee received.log"
-uart_print() {
-	DEVICE=/dev/ttyUSB0
-	if [ $# -eq 1 ]
-	then
-		DEVICE=$1
-	fi
+# uart_print() {
+# 	DEVICE=/dev/ttyUSB0
+# 	if [ $# -eq 1 ]
+# 	then
+# 		DEVICE=$1
+# 	fi
 
-	stty -F $DEVICE 406:0:18b2:8a30:3:1c:7f:15:4:2:64:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0
-	stdbuf -o0 cat $DEVICE
-}
-
-alias mpv="mpv --no-config --hwdec=yes --vo=gpu-next --target-colorspace-hint --gpu-context=waylandvk --gpu-api=vulkan --hdr-compute-peak=no --framedrop=no"
-
-# Keybindings
-
-ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
-if [[ ! -d $ZSH_CACHE_DIR ]]; then
-  mkdir $ZSH_CACHE_DIR
-fi
-
-source $ZSH/oh-my-zsh.sh
+# 	stty -F $DEVICE 406:0:18b2:8a30:3:1c:7f:15:4:2:64:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0
+# 	stdbuf -o0 cat $DEVICE
+# }
 
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# MacOS shortcuts
+alias nano='$NANO'
+
+# MacOS Dock spacers
+alias tf-macos-dock-large-spacer='defaults write com.apple.dock persistent-apps -array-add "{tile-data={}; tile-type=\"spacer-tile\";}" && killall Dock'
+alias tf-macos-dock-small-spacer='defaults write com.apple.dock persistent-apps -array-add "{\"tile-type\"=\"small-spacer-tile\";}" && killall Dock'
